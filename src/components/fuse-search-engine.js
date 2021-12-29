@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, createRef } from "react";
+import React, { useEffect, useState, createRef } from "react";
 import Fuse from 'fuse.js';
 import TinySegmenter from "tiny-segmenter";
 import { trigram } from 'n-gram';
@@ -120,7 +120,6 @@ function highlight(orgText, highlightTexts, targetKey, searchType) {
 
 function FuseSearchEngine(props) {
     const fileInput = createRef();
-    const [fileName, setFileName] = useState("")
     const [searchKeys, setSearchKeys] = useState([])
     const [documents, setDocuments] = useState([])
     const [options, setOptions] = useState()
@@ -136,16 +135,15 @@ function FuseSearchEngine(props) {
 
     const handleReadFile = (fileObj) => {
         if (fileObj) {
-            setFileName(fileObj.name)
             fileObj.arrayBuffer().then((buffer) => {
                 const workbook = XLSX.read(buffer, { type: 'buffer', bookVBA: true })
                 const firstSheetName = workbook.SheetNames[0]
                 const worksheet = workbook.Sheets[firstSheetName]
                 const data = XLSX.utils.sheet_to_json(worksheet)
                 const orgKeys = Object.keys(data[0])
-                var docs = new Array();
+                var docs = [];
                 data.forEach((doc) => {
-                    var _doc = new Object();
+                    var _doc = {};
                     Object.keys(doc).forEach((key) => {
                         _doc[key] = doc[key]
                         _doc[`search_${key}`] = encode(doc[key])
